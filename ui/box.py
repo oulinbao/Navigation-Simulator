@@ -1,24 +1,41 @@
 import wx
+from ui import config
+
 
 class Box(object):
 
     def __init__(self, panel, box_id, color, position, size):
-        self.white_box = self.create_box('white.jpg')
-        self.black_box = self.create_box('black.jpg')
-        self.green_box = self.create_box('green.jpg')
-        self.color_map = {Color.BLACK : self.black_box, 
-                          Color.WHITE : self.white_box, 
-                          Color.GREEN : self.green_box}
+        self._white_box = self._create_bitmap('image/white.jpg')
+        self._black_box = self._create_bitmap('image/black.jpg')
+        self._green_box = self._create_bitmap('image/green.jpg')
+        self._red_box = self._create_bitmap('image/red.jpg')
 
-        self.bitmap = wx.StaticBitmap(panel, box_id, self.color_map[color], pos=position, size=size)
+        self.color_map = {Color.BLACK : self._black_box, 
+                          Color.WHITE : self._white_box, 
+                          Color.GREEN : self._green_box,
+                          Color.RED   : self._red_box}
+
+        self._bitmap = wx.StaticBitmap(panel, box_id, self.color_map[color], 
+                                      pos=position, size=size)
+        self._position = position
         
-    def create_box(self, image_name):
+    def _create_bitmap(self, image_name):
         return wx.Image(image_name, wx.BITMAP_TYPE_JPEG).ConvertToBitmap()
     
-    def change_color(self, panel, color):
-        self.bitmap.SetBitmap(self.color_map[color])
+    def change_color(self, color):
+        self._bitmap.SetBitmap(self.color_map[color])
+        
+    def is_wall(self):
+        return self._bitmap.GetBitmap() == self._black_box
+        
+    @property
+    def pos_in_pixel(self):
+        row = self._position[0]
+        col = self._position[1]
+        return (col * config.UNIT_WIDTH + 10, row * config.UNIT_WIDTH + 10)
 
 class Color():
     WHITE = 'white'
     BLACK = 'black'
-    GREEN = 'green' 
+    GREEN = 'green'
+    RED = 'red'
