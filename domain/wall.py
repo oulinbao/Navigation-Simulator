@@ -1,4 +1,4 @@
-from ui import config
+from infra import config
 
 
 class Wall(object):

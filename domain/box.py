@@ -1,5 +1,5 @@
 import wx
-from ui import config
+from infra.color import Color
 
 
 class Box(object):
@@ -16,8 +16,15 @@ class Box(object):
                           Color.RED   : self._red_box}
 
         self._bitmap = wx.StaticBitmap(panel, box_id, self.color_map[color], 
-                                      pos=position, size=size)
+                                       pos=position, size=size)
         self._position = position
+
+    def __del__(self):
+        del self._bitmap
+        del self._white_box
+        del self._black_box
+        del self._green_box
+        del self._red_box
         
     def _create_bitmap(self, image_name):
         return wx.Image(image_name, wx.BITMAP_TYPE_JPEG).ConvertToBitmap()
@@ -27,15 +34,3 @@ class Box(object):
         
     def is_wall(self):
         return self._bitmap.GetBitmap() == self._black_box
-        
-    @property
-    def pos_in_pixel(self):
-        row = self._position[0]
-        col = self._position[1]
-        return (col * config.UNIT_WIDTH + 10, row * config.UNIT_WIDTH + 10)
-
-class Color():
-    WHITE = 'white'
-    BLACK = 'black'
-    GREEN = 'green'
-    RED = 'red'

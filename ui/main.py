@@ -1,37 +1,38 @@
 import wx
-from ui.housemap import HouseMap
-from ui import config
-from ui.robot import Robot, Direction
-import random
-from time import sleep
-from threading import Thread
+from threading import Thread, Condition
+from domain.game import Game
+from domain.housemap import HouseMap
+from infra import config
 
 
-class House(wx.Frame):
+class HouseFrame(wx.Frame):
 
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, 
+        wx.Frame.__init__(self, parent, title=title,
                           size=(config.HOUSE_LENGTH, config.HOUSE_WIDTH))
+        self.condition = Condition()
         self.panel = wx.Panel(self, -1)
-        self.house_map = HouseMap(self.panel)
-        self.robot = Robot(self.house_map, position=(2, 2), direction=Direction.EAST)
+        self._house_map = HouseMap(self.panel, self)
+        thread = Thread(target=self.start)
+        thread.start()
         self.Show(True)
 
+    def refresh(self, position):
+        self._house_map.show_robot(position)
+        self.panel.Refresh()
+
+    def reset(self):
+        with self.condition:
+            self._house_map.destroy_boxes()
+            self._house_map.draw_house(self.panel)
+            self.condition.notify()
+            print 'reset finished in frame!'
 
     def start(self):
-        action_map = [self.robot.move_forward, self.robot.turn_left, self.robot.move_forward, 
-                      self.robot.move_forward, self.robot.turn_right, self.robot.move_forward, 
-                      self.robot.move_forward, self.robot.move_forward, self.robot.move_forward]
-        for i in range(0, 1000):
-            action = action_map[random.randint(0, 8)]
-            action()
-            sleep(0.1)
-            wx.CallAfter(self.panel.Refresh)
-            
-        
-app = wx.App(False)
-house = House(None, 'Robot path planning')
-thread = Thread(target=house.start)
-thread.start()
+        game = Game(self, self._house_map)
+        game.play()
 
-app.MainLoop()
+if __name__ == '__main__':
+    app = wx.App(False)
+    house = HouseFrame(None, 'Robot path planning')
+    app.MainLoop()
