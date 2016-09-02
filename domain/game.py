@@ -23,12 +23,16 @@ class Game(object):
             state = self._env.reset()
 
             for step in xrange(STEP):
-                sleep(0.01)
+                sleep(0)
                 action_type = dqn.get_egreedy_action(state)
                 next_state, reward, done = self._env.accept(action_type)
                 dqn.perceive(state, action_type, reward, next_state, done)
-                wx.CallAfter(self._house_frame.refresh, (next_state[0], next_state[1]))
+
+                position = (next_state[0], next_state[1])
+                wx.CallAfter(self._house_frame.refresh, position)
                 state = next_state
 
                 if done:
                     break
+
+            dqn.save_train_params()

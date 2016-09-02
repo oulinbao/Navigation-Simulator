@@ -32,17 +32,18 @@ class HouseMap(ENV):
         self._panel = panel
         self._frame = frame
         self._robot = Robot(INIT_POSITION, Direction.EAST)
-        self.draw_house(panel)
+        self._walls = [HorizonWall(0, 39), VerticalWall(39, 1199),
+                       HorizonWall(1160, 1199), VerticalWall(0, 1160),
+                       VerticalWall(700, 1180), VerticalWall(20, 420)]
+        self._draw_house(panel)
 
     @property
     def robot(self):
         return self._robot
 
-    def draw_house(self, panel):
+    def _draw_house(self, panel):
         self._draw_base_grid(panel)
-        self._draw_walls([HorizonWall(0, 39), VerticalWall(39, 1199),
-                          HorizonWall(1160, 1199), VerticalWall(0, 1160),
-                          VerticalWall(700, 1180), VerticalWall(20, 420)])
+        self._draw_walls(self._walls)
         self._draw_target_box(TARGET_POS)
 
     def _draw_base_grid(self, panel):
@@ -64,6 +65,15 @@ class HouseMap(ENV):
     def _draw_target_box(self, position):
         box = self.get_box(position)
         box.change_color(Color.RED)
+
+    def reset_house_map(self):
+        self._reset_base_grid()
+        self._draw_walls(self._walls)
+        self._draw_target_box(TARGET_POS)
+
+    def _reset_base_grid(self):
+        for box in self._boxes:
+            box.change_color(Color.WHITE)
 
     def get_box(self, position):
         row = position[0]
@@ -101,8 +111,3 @@ class HouseMap(ENV):
 
         print 'env reset ok'
         return [INIT_POSITION[0], INIT_POSITION[1], INIT_DIRECTION]
-
-    def destroy_boxes(self):
-        for box in self._boxes:
-            del box
-        self._boxes = []
