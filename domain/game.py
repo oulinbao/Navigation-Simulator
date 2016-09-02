@@ -4,7 +4,7 @@ from direction import Direction
 from algrithm.dqn import DQN
 
 EPISODE = 10000     # Episode limitation
-STEP = 1500          # Step limitation in an episode
+STEP = 10000          # Step limitation in an episode
 TARGET_POS = [4, 30]
 INIT_POSITION = [2, 2]
 INIT_DIRECTION = Direction.EAST

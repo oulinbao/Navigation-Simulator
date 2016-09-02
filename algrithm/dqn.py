@@ -60,7 +60,7 @@ class DQN():
         self.y_input = tf.placeholder("float", [None])
         Q_action = tf.reduce_sum(tf.mul(self.Q_value, self.action_input), reduction_indices=1)
         self.cost = tf.reduce_mean(tf.square(self.y_input - Q_action))
-        self.optimizer = tf.train.AdamOptimizer(0.001).minimize(self.cost)
+        self.optimizer = tf.train.AdamOptimizer(0.0001).minimize(self.cost)
 
     def _train_Q_network(self):
         if len(self.replay_buffer) < BATCH_SIZE:

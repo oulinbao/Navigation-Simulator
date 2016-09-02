@@ -6,9 +6,9 @@ ACTION_MOVE_FORWARD = 0
 ACTION_TURN_LEFT = 1
 ACTION_TURN_RIGHT = 2
 
-REWARD_DONE = 1000
+REWARD_DONE = 100
 REWARD_ZERO = 0
-REWARD_FAR = -1
+REWARD_FAR = 0
 REWARD_WALL = 0
 REWARD_REPEAT = -1
 
@@ -52,7 +52,8 @@ class MoveForward(Action):
             return self._src_pos
 
     def _calc_reward(self, next_pos):
-        if next_pos == TARGET_POS:
+        if next_pos[0] < TARGET_POS[0] + 3 and next_pos[0] > TARGET_POS[0] - 3 and \
+             next_pos[1] < TARGET_POS[1] + 3 and next_pos[1] > TARGET_POS[1] - 3:
             return REWARD_DONE, True
 
         if self._more_far(next_pos):
