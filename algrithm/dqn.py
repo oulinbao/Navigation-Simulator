@@ -40,21 +40,27 @@ class DQN():
         # network weights
         W1 = self.weight_variable([self.state_dim, 32])
         b1 = self.bias_variable([32])
-        W2 = self.weight_variable([32, self.action_dim])
-        b2 = self.bias_variable([self.action_dim])
+        W2 = self.weight_variable([32, 32])
+        b2 = self.bias_variable([32])
+        W3 = self.weight_variable([32, 32])
+        b3 = self.bias_variable([32])
+        W4 = self.weight_variable([32, self.action_dim])
+        b4 = self.bias_variable([self.action_dim])
         # input layer
         self.state_input = tf.placeholder("float", [None, self.state_dim])
         # hidden layers
-        h_layer = tf.nn.relu(tf.matmul(self.state_input, W1) + b1)
+        h_layer1 = tf.nn.relu(tf.matmul(self.state_input, W1) + b1)
+        h_layer2 = tf.nn.relu(tf.matmul(h_layer1, W2) + b2)
+        h_layer3 = tf.nn.relu(tf.matmul(h_layer2, W3) + b3)
         # Q Value layer
-        self.Q_value = tf.matmul(h_layer, W2) + b2
+        self.Q_value = tf.matmul(h_layer3, W4) + b4
 
     def create_training_method(self):
         self.action_input = tf.placeholder("float", [None, self.action_dim])  # one hot presentation
         self.y_input = tf.placeholder("float", [None])
         Q_action = tf.reduce_sum(tf.mul(self.Q_value, self.action_input), reduction_indices=1)
         self.cost = tf.reduce_mean(tf.square(self.y_input - Q_action))
-        self.optimizer = tf.train.AdamOptimizer(0.0001).minimize(self.cost)
+        self.optimizer = tf.train.AdamOptimizer(0.001).minimize(self.cost)
 
     def _train_Q_network(self):
         if len(self.replay_buffer) < BATCH_SIZE:
@@ -99,10 +105,13 @@ class DQN():
 
     def get_egreedy_action(self, state):
         Q_value = self.Q_value.eval(feed_dict={self.state_input: [state]})[0]
-        self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / 100000
+        self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / 1000000
 
         if random.random() <= self.epsilon:
-            return random.randint(0, self.action_dim - 1)
+            action_map = [0,0,0,0,0,1,2]
+            return action_map[random.randint(0, 6)]
+
+            # return random.randint(0, self.action_dim - 1)
         else:
             print 'select action from DQN', self.epsilon
             return np.argmax(Q_value)

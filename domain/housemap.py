@@ -74,6 +74,7 @@ class HouseMap(ENV):
     def _reset_base_grid(self):
         for box in self._boxes:
             box.change_color(Color.WHITE)
+            box.pass_through = False
 
     def get_box(self, position):
         row = position[0]
@@ -111,3 +112,11 @@ class HouseMap(ENV):
 
         print 'env reset ok'
         return [INIT_POSITION[0], INIT_POSITION[1], INIT_DIRECTION]
+
+    def is_repeated(self, pos):
+        box = self.get_box(pos)
+        return box.pass_through
+
+    def record_path(self, pos):
+        box = self.get_box(pos)
+        box.pass_through = True
