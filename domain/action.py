@@ -8,7 +8,7 @@ ACTION_TURN_RIGHT = 2
 
 REWARD_DONE = 100
 REWARD_ZERO = 0
-REWARD_FAR = 0
+REWARD_GOOD = 200
 REWARD_WALL = 0
 REWARD_REPEAT = 0
 REWARD_NOT_FINISHED = -100
@@ -56,10 +56,13 @@ class MoveForward(Action):
     def _calc_reward(self, next_pos):
         if next_pos[0] < TARGET_POS[0] + 3 and next_pos[0] > TARGET_POS[0] - 3 and \
              next_pos[1] < TARGET_POS[1] + 3 and next_pos[1] > TARGET_POS[1] - 3:
-            return REWARD_DONE, True
+            if self._robot.action_count > 300:
+                return REWARD_DONE, True
+            else:
+                return REWARD_GOOD, True
 
         print self._robot.action_count
-        if self._robot.action_count == STEP - 1:
+        if self._robot.action_count >= STEP - 1:
             return REWARD_NOT_FINISHED, False
 
         return REWARD_ZERO, False
@@ -68,17 +71,17 @@ class MoveForward(Action):
         # elif self._repeat(next_pos):
         #     return REWARD_REPEAT, False
 
-    def _more_far(self, next_pos):
-        old_distance = self._calc_distance(self._src_pos, TARGET_POS)
-        new_distance = self._calc_distance(next_pos, TARGET_POS)
-        return new_distance > old_distance
-
-    def _calc_distance(self, pos1, pos2):
-        result = map(lambda x, y : y - x, pos1, pos2)
-        return result[0]**2 + result[1]**2
-
-    def _repeat(self, pos):
-        return self._house_map.is_repeated(pos)
+    # def _more_far(self, next_pos):
+    #     old_distance = self._calc_distance(self._src_pos, TARGET_POS)
+    #     new_distance = self._calc_distance(next_pos, TARGET_POS)
+    #     return new_distance > old_distance
+    #
+    # def _calc_distance(self, pos1, pos2):
+    #     result = map(lambda x, y : y - x, pos1, pos2)
+    #     return result[0]**2 + result[1]**2
+    #
+    # def _repeat(self, pos):
+    #     return self._house_map.is_repeated(pos)
 
 class TurnLeft(Action):
     def __init__(self, house_map):

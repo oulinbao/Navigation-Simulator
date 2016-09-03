@@ -7,10 +7,10 @@ import random
 STATE_DIM = 3           # row, col
 ACTION_DIM = 3          # move_forward, turn right, turn left
 GAMMA = 0.9             # discount factor for target Q
-INITIAL_EPSILON = 0.9   # starting value of epsilon
+INITIAL_EPSILON = 0.7   # starting value of epsilon
 FINAL_EPSILON = 0.01    # final value of epsilon
 REPLAY_SIZE = 10000     # experience replay buffer size
-BATCH_SIZE = 32         # size of minibatch
+BATCH_SIZE = 10         # size of minibatch
 HIDDEN_LAYER_DIM = 32
 
 
@@ -38,13 +38,13 @@ class DQN():
 
     def create_Q_network(self):
         # network weights
-        W1 = self.weight_variable([self.state_dim, 32])
-        b1 = self.bias_variable([32])
-        W2 = self.weight_variable([32, 32])
-        b2 = self.bias_variable([32])
-        W3 = self.weight_variable([32, 32])
-        b3 = self.bias_variable([32])
-        W4 = self.weight_variable([32, self.action_dim])
+        W1 = self.weight_variable([self.state_dim, HIDDEN_LAYER_DIM])
+        b1 = self.bias_variable([HIDDEN_LAYER_DIM])
+        W2 = self.weight_variable([HIDDEN_LAYER_DIM, HIDDEN_LAYER_DIM])
+        b2 = self.bias_variable([HIDDEN_LAYER_DIM])
+        W3 = self.weight_variable([HIDDEN_LAYER_DIM, HIDDEN_LAYER_DIM])
+        b3 = self.bias_variable([HIDDEN_LAYER_DIM])
+        W4 = self.weight_variable([HIDDEN_LAYER_DIM, self.action_dim])
         b4 = self.bias_variable([self.action_dim])
         # input layer
         self.state_input = tf.placeholder("float", [None, self.state_dim])
