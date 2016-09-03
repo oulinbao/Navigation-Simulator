@@ -31,7 +31,7 @@ class DQN():
         self.session = tf.InteractiveSession()
         try:
             self.saver = tf.train.Saver()
-            self.saver.restore(self.session, 'train_result')
+            self.saver.restore(self.session, 'algrithm/train_result')
         except ValueError, e:
             print e.message
             self.session.run(tf.initialize_all_variables())
@@ -105,12 +105,11 @@ class DQN():
 
     def get_egreedy_action(self, state):
         Q_value = self.Q_value.eval(feed_dict={self.state_input: [state]})[0]
-        self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / 1000000
+        # self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / 1000000
 
         if random.random() <= self.epsilon:
             action_map = [0,0,0,0,0,1,2]
             return action_map[random.randint(0, 6)]
-
             # return random.randint(0, self.action_dim - 1)
         else:
             print 'select action from DQN', self.epsilon
@@ -128,4 +127,4 @@ class DQN():
         self._train_Q_network()
 
     def save_train_params(self):
-        self.saver.save(self.session, 'train_result')
+        self.saver.save(self.session, 'algrithm/train_result')

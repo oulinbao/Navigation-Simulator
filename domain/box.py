@@ -5,10 +5,10 @@ from infra.color import Color
 class Box(object):
 
     def __init__(self, panel, box_id, color, position, size):
-        self._white_box = self._create_bitmap('image/white.jpg')
-        self._black_box = self._create_bitmap('image/black.jpg')
-        self._green_box = self._create_bitmap('image/green.jpg')
-        self._red_box = self._create_bitmap('image/red.jpg')
+        self._white_box = self._create_bitmap('infra/image/white.jpg')
+        self._black_box = self._create_bitmap('infra/image/black.jpg')
+        self._green_box = self._create_bitmap('infra/image/green.jpg')
+        self._red_box = self._create_bitmap('infra/image/red.jpg')
 
         self.color_map = {Color.BLACK : self._black_box, 
                           Color.WHITE : self._white_box, 

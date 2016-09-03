@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from direction import TurnType
-from game import TARGET_POS
+from game import TARGET_POS, STEP
 
 ACTION_MOVE_FORWARD = 0
 ACTION_TURN_LEFT = 1
@@ -10,7 +10,8 @@ REWARD_DONE = 100
 REWARD_ZERO = 0
 REWARD_FAR = 0
 REWARD_WALL = 0
-REWARD_REPEAT = -1
+REWARD_REPEAT = 0
+REWARD_NOT_FINISHED = -100
 
 
 class Command(object):
@@ -38,6 +39,7 @@ class MoveForward(Action):
     def execute(self):
         next_pos = self._move()
         self._robot.position = next_pos
+        self._robot.action_count += 1
         self._house_map.record_path(next_pos)
 
         reward, done = self._calc_reward(next_pos)
@@ -46,7 +48,7 @@ class MoveForward(Action):
     def _move(self):
         next_box, next_pos = self._house_map.get_next_box()
         if not next_box.is_wall():
-            print 'new positon', next_pos
+            # print 'new positon', next_pos
             return next_pos
         else:
             return self._src_pos
@@ -56,10 +58,15 @@ class MoveForward(Action):
              next_pos[1] < TARGET_POS[1] + 3 and next_pos[1] > TARGET_POS[1] - 3:
             return REWARD_DONE, True
 
-        if self._more_far(next_pos):
-            return REWARD_FAR, False
-        elif self._repeat(next_pos):
-            return REWARD_REPEAT, False
+        print self._robot.action_count
+        if self._robot.action_count == STEP - 1:
+            return REWARD_NOT_FINISHED, False
+
+        return REWARD_ZERO, False
+        # if self._more_far(next_pos):
+        #     return REWARD_FAR, False
+        # elif self._repeat(next_pos):
+        #     return REWARD_REPEAT, False
 
     def _more_far(self, next_pos):
         old_distance = self._calc_distance(self._src_pos, TARGET_POS)
@@ -80,6 +87,7 @@ class TurnLeft(Action):
     def execute(self):
         print 'turn left'
         self._robot.direction = TurnType.TURN_LEFT
+        self._robot.action_count += 1
         return self._src_pos, REWARD_ZERO, False
 
 
@@ -90,4 +98,5 @@ class TurnRight(Action):
     def execute(self):
         print 'turn right'
         self._robot.direction = TurnType.TURN_RIGHT
+        self._robot.action_count += 1
         return self._src_pos, REWARD_ZERO, False
