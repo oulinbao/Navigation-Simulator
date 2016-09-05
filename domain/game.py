@@ -1,13 +1,10 @@
 import wx
 from time import sleep
-from direction import Direction
 from algrithm.dqn import DQN
 
 EPISODE = 100000     # Episode limitation
 STEP = 300          # Step limitation in an episode
-TARGET_POS = [3, 8]
-INIT_POSITION = [1, 1]
-INIT_DIRECTION = Direction.EAST
+
 
 
 class Game(object):
@@ -20,12 +17,13 @@ class Game(object):
 
         for episode in xrange(EPISODE):
             print 'start episode:', episode
-            # sleep(1)
-            # self.train_episode(dqn)
-            # dqn.save_train_params()
+            sleep(1)
+            self._env.reset_target_pos()
+            self.train_episode(dqn)
+            dqn.save_train_params()
 
             sleep(1)
-            if episode % 5 == 0:
+            if episode % 1 == 0:
                 self.test_dqn(dqn)
 
     def train_episode(self, dqn):

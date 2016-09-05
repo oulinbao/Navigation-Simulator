@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from direction import TurnType
-from game import TARGET_POS, STEP
+from game import STEP
 
 ACTION_MOVE_FORWARD = 0
 ACTION_TURN_LEFT = 1
@@ -54,7 +54,7 @@ class MoveForward(Action):
             return self._src_pos
 
     def _calc_reward(self, next_pos):
-        if next_pos == TARGET_POS:
+        if next_pos == self._house_map.target_pos:
             return REWARD_DONE, True
 
         print self._robot.action_count

@@ -25,7 +25,7 @@ class HouseFrame(wx.Frame):
     def reset(self):
         with self.condition:
             self._house_map.reset_house_map()
-            self.condition.notify()
+            # self.condition.notify()
             print 'reset finished in frame!'
 
     def start(self):

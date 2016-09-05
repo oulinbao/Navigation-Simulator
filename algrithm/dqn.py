@@ -7,7 +7,7 @@ import random
 STATE_DIM = 3           # row, col
 ACTION_DIM = 3          # move_forward, turn right, turn left
 GAMMA = 0.9             # discount factor for target Q
-INITIAL_EPSILON = 0.5   # starting value of epsilon
+INITIAL_EPSILON = 0.9   # starting value of epsilon
 FINAL_EPSILON = 0.01    # final value of epsilon
 REPLAY_SIZE = 10000     # experience replay buffer size
 BATCH_SIZE = 10         # size of minibatch
@@ -105,7 +105,7 @@ class DQN():
 
     def get_egreedy_action(self, state):
         Q_value = self.Q_value.eval(feed_dict={self.state_input: [state]})[0]
-        # self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / 1000000
+        self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / 100000
 
         if random.random() <= self.epsilon:
             action_map = [0,0,0,0,0,1,2]
