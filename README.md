@@ -16,8 +16,12 @@ Try to find a path from point to point on a house map by using DQN.
 
 ## Run
 git clone https://github.com/oulinbao/Navigation-Simulator or download zip package.
+
 cd Navigation-Simulator
+
 python main.py
 
 ## Note!
-MLP_in_small_map branch has study ok! Please try.
+MLP_in_small_map branch has study ok!
+
+Have fun!
