@@ -3,10 +3,10 @@ from time import sleep
 from direction import Direction
 from algrithm.dqn import DQN
 
-EPISODE = 10000     # Episode limitation
-STEP = 1000          # Step limitation in an episode
-TARGET_POS = [4, 30]
-INIT_POSITION = [2, 2]
+EPISODE = 100000     # Episode limitation
+STEP = 300          # Step limitation in an episode
+TARGET_POS = [2, 8]
+INIT_POSITION = [1, 1]
 INIT_DIRECTION = Direction.EAST
 
 
@@ -20,13 +20,12 @@ class Game(object):
 
         for episode in xrange(EPISODE):
             print 'start episode:', episode
-            sleep(2)
-
-            self.train_episode(dqn)
-            dqn.save_train_params()
+            # sleep(1)
+            # self.train_episode(dqn)
+            # dqn.save_train_params()
 
             sleep(1)
-            if episode % 10 == 0:
+            if episode % 1 == 0:
                 self.test_dqn(dqn)
 
     def train_episode(self, dqn):
