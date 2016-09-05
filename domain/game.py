@@ -5,7 +5,7 @@ from algrithm.dqn import DQN
 
 EPISODE = 100000     # Episode limitation
 STEP = 300          # Step limitation in an episode
-TARGET_POS = [2, 8]
+TARGET_POS = [3, 8]
 INIT_POSITION = [1, 1]
 INIT_DIRECTION = Direction.EAST
 
@@ -25,7 +25,7 @@ class Game(object):
             # dqn.save_train_params()
 
             sleep(1)
-            if episode % 1 == 0:
+            if episode % 5 == 0:
                 self.test_dqn(dqn)
 
     def train_episode(self, dqn):

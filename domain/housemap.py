@@ -34,7 +34,7 @@ class HouseMap(ENV):
         self._robot = Robot(INIT_POSITION, Direction.EAST)
         self._walls = [HorizonWall(0, 9), VerticalWall(9, 99),
                        HorizonWall(90, 99), VerticalWall(0, 99),
-                       VerticalWall(6, 56), VerticalWall(43, 93)]
+                       VerticalWall(43, 73), VerticalWall(5, 45), VerticalWall(57, 77)]
         self._draw_house(panel)
 
     @property

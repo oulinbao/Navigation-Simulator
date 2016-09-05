@@ -58,7 +58,7 @@ class MoveForward(Action):
             return REWARD_DONE, True
 
         print self._robot.action_count
-        if self._robot.action_count >= STEP - 1:
+        if self._robot.action_count >= STEP:
             return REWARD_NOT_FINISHED, False
 
         return REWARD_ZERO, False
@@ -72,7 +72,8 @@ class TurnLeft(Action):
         print 'turn left'
         self._robot.direction = TurnType.TURN_LEFT
         self._robot.action_count += 1
-        return self._src_pos, REWARD_ZERO, False
+        reward = REWARD_NOT_FINISHED if self._robot.action_count >= STEP else REWARD_ZERO
+        return self._src_pos, reward, False
 
 
 class TurnRight(Action):
@@ -83,4 +84,5 @@ class TurnRight(Action):
         print 'turn right'
         self._robot.direction = TurnType.TURN_RIGHT
         self._robot.action_count += 1
-        return self._src_pos, REWARD_ZERO, False
+        reward = REWARD_NOT_FINISHED if self._robot.action_count >= STEP else REWARD_ZERO
+        return self._src_pos, reward, False
