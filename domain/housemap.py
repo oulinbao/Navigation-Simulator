@@ -6,13 +6,12 @@ from direction import Direction
 from infra import config
 from infra.color import Color
 from abc import ABCMeta, abstractmethod
+from game import INIT_POSITION, INIT_DIRECTION
 import wx
 import time
 import random
 
 
-INIT_POSITION = [1, 1]
-INIT_DIRECTION = Direction.EAST
 
 class ENV(object):
     __metaclass__ = ABCMeta
@@ -78,11 +77,15 @@ class HouseMap(ENV):
         self._reset_base_grid()
         self._draw_walls(self._walls)
         self._draw_target_box(self._target_pos)
+        self._reset_robot()
 
     def _reset_base_grid(self):
         for box in self._boxes:
             box.change_color(Color.WHITE)
             box.pass_through = False
+
+    def _reset_robot(self):
+        self._robot.reset()
 
     def get_box(self, position):
         row = position[0]
@@ -105,7 +108,8 @@ class HouseMap(ENV):
                       ACTION_TURN_RIGHT: TurnRight(self)}
         action = action_map[action_type]
         next_pos, reward, done = action.execute()
-        return [next_pos[0], next_pos[1], self._robot.direction], reward, done
+        return [next_pos[0], next_pos[1], self._robot.direction, self._target_pos[0], self._target_pos[1]], \
+               reward, done
 
     def show_robot(self, position):
         box = self.get_box(position)
@@ -113,17 +117,9 @@ class HouseMap(ENV):
 
     def reset(self):
         wx.CallAfter(self._frame.reset)
-        time.sleep(0)  # release cpu time
-        with self._frame.condition:
-            # self._frame.condition.wait()
-            self._robot = Robot(INIT_POSITION, Direction.EAST)
-
+        time.sleep(1)  # release cpu time
         print 'env reset ok'
-        return [INIT_POSITION[0], INIT_POSITION[1], INIT_DIRECTION]
-
-    def is_repeated(self, pos):
-        box = self.get_box(pos)
-        return box.pass_through
+        return [INIT_POSITION[0], INIT_POSITION[1], INIT_DIRECTION, self._target_pos[0], self._target_pos[1]]
 
     def record_path(self, pos):
         box = self.get_box(pos)

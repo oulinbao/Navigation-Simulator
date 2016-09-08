@@ -4,7 +4,7 @@ from collections import deque
 import random
 
 # Hyper Parameters for DQN
-STATE_DIM = 3           # row, col
+STATE_DIM = 5           # init row, col, direction, target row, col
 ACTION_DIM = 3          # move_forward, turn right, turn left
 GAMMA = 0.9             # discount factor for target Q
 INITIAL_EPSILON = 0.9   # starting value of epsilon

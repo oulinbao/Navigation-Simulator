@@ -1,5 +1,5 @@
 from direction import TurnType
-
+from game import INIT_POSITION, INIT_DIRECTION
 
 class Robot(object):
     def __init__(self, position, direction):
@@ -31,3 +31,8 @@ class Robot(object):
     @action_count.setter
     def action_count(self, count):
         self._action_count += 1
+
+    def reset(self):
+        self._position = INIT_POSITION
+        self._direction = INIT_DIRECTION
+        self._action_count = 0
