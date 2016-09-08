@@ -20,9 +20,9 @@ class Game(object):
 
         for episode in xrange(EPISODE):
             print 'start episode:', episode
-            # sleep(1)
-            # self.train_episode(dqn)
-            # dqn.save_train_params()
+            sleep(1)
+            self.train_episode(dqn)
+            dqn.save_train_params()
 
             sleep(1)
             if episode % 5 == 0:

@@ -10,7 +10,6 @@ class HouseFrame(wx.Frame):
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title,
                           size=(config.HOUSE_LENGTH, config.HOUSE_WIDTH))
-        self.condition = Condition()
         self.panel = wx.Panel(self, -1)
         self._house_map = HouseMap(self.panel, self)
         thread = Thread(target=self.start)
@@ -23,9 +22,7 @@ class HouseFrame(wx.Frame):
         self.panel.Refresh()
 
     def reset(self):
-        with self.condition:
             self._house_map.reset_house_map()
-            self.condition.notify()
             print 'reset finished in frame!'
 
     def start(self):
