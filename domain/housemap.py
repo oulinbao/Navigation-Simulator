@@ -1,4 +1,4 @@
-from box import Box
+from box import Box, BoxState
 from wall import HorizonWall, VerticalWall
 from robot import Robot
 from action import *
@@ -95,14 +95,15 @@ class HouseMap(ENV):
                       ACTION_TURN_RIGHT: TurnRight(self)}
         action = action_map[action_type]
         next_pos, reward, done = action.execute()
-        return [next_pos[0], next_pos[1], self._robot.direction], reward, done
+        return self._robot.current_state + self._collect_current_state(), \
+            reward, done
 
-    def show_robot(self, position):
-        box = self.get_box(position)
+    def show_robot(self):
+        box = self.get_box(self._robot.position)
         box.change_color(Color.GREEN)
 
-    def show_repeated(self, position):
-        box = self.get_box(position)
+    def show_repeated(self):
+        box = self.get_box(self._robot.position)
         if box.passed_count > 1:
             box.change_color(Color.RED)
 
@@ -110,11 +111,28 @@ class HouseMap(ENV):
         wx.CallAfter(self._frame.reset)
         time.sleep(1)  # release cpu time
         print 'env reset ok'
-        return [INIT_POSITION[0], INIT_POSITION[1], INIT_DIRECTION]
+        return self._robot.init_state + self._collect_current_state()
+
+    def _collect_current_state(self):
+        # [index, state{0:not pass, 1:passed, 2:wall}, ....]
+        state = []
+        for box in self._boxes:
+            state.append(box.id)
+            if box.is_wall():
+                state.append(BoxState.BOX_STATE_WALL)
+            elif box.passed_count == 0:
+                state.append(BoxState.BOX_STATE_NOT_PASS)
+            else:
+                state.append(BoxState.BOX_STATE_PASSED)
+        return state
 
     def record_footprint(self, pos):
         box = self.get_box(pos)
         box.passed_count += 1
+
+    def just_passed(self, pos):
+        box = self.get_box(pos)
+        return box.passed_count == 1
 
     def calculate_repeat_rate(self):
         return float(self._repeated_count()) / self._covered_count()

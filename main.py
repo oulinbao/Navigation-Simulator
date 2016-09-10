@@ -16,15 +16,16 @@ class HouseFrame(wx.Frame):
         thread.start()
         self.Show(True)
 
-    def refresh(self, position, show_type):
-        self._house_map.show_robot(position)
-        self._house_map.show_repeated(position)
+    def refresh(self, show_type):
+        self._house_map.show_robot()
+        self._house_map.show_repeated()
         self.SetTitle(show_type)
         self.panel.Refresh()
 
     def reset(self):
-            self._house_map.reset_house_map()
-            print 'reset finished in frame!'
+        self._house_map.reset_house_map()
+        self._house_map.show_robot()
+        print 'reset finished in frame!'
 
     def start(self):
         game = Game(self, self._house_map)

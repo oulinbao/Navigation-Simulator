@@ -4,7 +4,7 @@ from collections import deque
 import random
 
 # Hyper Parameters for DQN
-STATE_DIM = 3           # row, col
+STATE_DIM = 203         # robot state([row, col, direction]) + house map state([index, state, ...])
 ACTION_DIM = 3          # move_forward, turn right, turn left
 GAMMA = 0.9             # discount factor for target Q
 INITIAL_EPSILON = 0.9   # starting value of epsilon
@@ -112,7 +112,7 @@ class DQN():
             return action_map[random.randint(0, 6)]
             # return random.randint(0, self.action_dim - 1)
         else:
-            # print 'select action from DQN, probability:', self.epsilon
+            # print 'DQN action probability:', self.epsilon
             return np.argmax(Q_value)
 
     def get_action(self, state):

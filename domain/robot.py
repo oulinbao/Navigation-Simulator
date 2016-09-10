@@ -37,3 +37,11 @@ class Robot(object):
         self._position = INIT_POSITION
         self._direction = INIT_DIRECTION
         self._action_count = 0
+
+    @property
+    def init_state(self):
+        return [INIT_POSITION[0], INIT_POSITION[1], INIT_DIRECTION]
+
+    @property
+    def current_state(self):
+        return [self._position[0], self._position[1], self._direction]
