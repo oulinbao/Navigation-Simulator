@@ -44,7 +44,6 @@ class HouseMap(ENV):
     def _draw_house(self, panel):
         self._draw_base_grid(panel)
         self._draw_walls(self._walls)
-        self._draw_target_box(TARGET_POS)
 
     def _draw_base_grid(self, panel):
         for row in range(config.ROW_NUM):
@@ -62,20 +61,15 @@ class HouseMap(ENV):
                 box = self._boxes[box_id]
                 box.change_color(Color.BLACK)
 
-    def _draw_target_box(self, position):
-        box = self.get_box(position)
-        box.change_color(Color.RED)
-
     def reset_house_map(self):
         self._reset_base_grid()
         self._draw_walls(self._walls)
-        self._draw_target_box(TARGET_POS)
         self._reset_robot()
 
     def _reset_base_grid(self):
         for box in self._boxes:
             box.change_color(Color.WHITE)
-            box.pass_through = False
+            box.passed_count = 0
 
     def _reset_robot(self):
         self._robot.reset()
@@ -107,16 +101,40 @@ class HouseMap(ENV):
         box = self.get_box(position)
         box.change_color(Color.GREEN)
 
+    def show_repeated(self, position):
+        box = self.get_box(position)
+        if box.passed_count > 1:
+            box.change_color(Color.RED)
+
     def reset(self):
         wx.CallAfter(self._frame.reset)
         time.sleep(1)  # release cpu time
         print 'env reset ok'
         return [INIT_POSITION[0], INIT_POSITION[1], INIT_DIRECTION]
 
-    def is_repeated(self, pos):
+    def record_footprint(self, pos):
         box = self.get_box(pos)
-        return box.pass_through
+        box.passed_count += 1
 
-    def record_path(self, pos):
-        box = self.get_box(pos)
-        box.pass_through = True
+    def calculate_repeat_rate(self):
+        return float(self._repeated_count()) / self._covered_count()
+
+    def calculate_coverage_rate(self):
+        return float(self._covered_count()) / self._all_availabe_count()
+
+    def is_all_covered(self):
+        return self._covered_count() == self._all_availabe_count()
+
+    def _all_availabe_count(self):
+        return len([box for box in self._boxes if not box.is_wall()])
+
+    def _covered_count(self):
+        return self._cal_count(0)
+
+    def _repeated_count(self):
+        return self._cal_count(1)
+
+    def _cal_count(self, pass_count):
+        return len([box for box in self._boxes if box.passed_count > pass_count])
+
+

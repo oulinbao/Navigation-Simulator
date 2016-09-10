@@ -18,7 +18,7 @@ class Box(object):
         self._bitmap = wx.StaticBitmap(panel, box_id, self.color_map[color], 
                                        pos=position, size=size)
         self._position = position
-        self._passed = False
+        self._passed_count = 0
 
     def __del__(self):
         del self._bitmap
@@ -37,9 +37,9 @@ class Box(object):
         return self._bitmap.GetBitmap() == self._black_box
 
     @property
-    def pass_through(self):
-        return self._passed
+    def passed_count(self):
+        return self._passed_count
 
-    @pass_through.setter
-    def pass_through(self, flag):
-        self._passed = flag
+    @passed_count.setter
+    def passed_count(self, flag):
+        self._passed_count = flag

@@ -1,17 +1,11 @@
 from abc import ABCMeta, abstractmethod
 from direction import TurnType
-from game import TARGET_POS, STEP
+from reward import RewardCalculator, REWARD_ZERO
+from game import MAX_STEP
 
 ACTION_MOVE_FORWARD = 0
 ACTION_TURN_LEFT = 1
 ACTION_TURN_RIGHT = 2
-
-REWARD_DONE = 100
-REWARD_ZERO = 0
-REWARD_GOOD = 200
-REWARD_WALL = 0
-REWARD_REPEAT = 0
-REWARD_NOT_FINISHED = -100
 
 
 class Command(object):
@@ -31,6 +25,14 @@ class Action(Command):
     def execute(self):
         pass
 
+    def _calc_reward(self):
+        if self._robot.action_count == MAX_STEP or self._house_map.is_all_covered():
+            calculator = RewardCalculator(self._house_map.calculate_coverage_rate(),
+                                          self._house_map.calculate_repeat_rate(),
+                                          self._robot.action_count)
+            return calculator.calculate()
+        return REWARD_ZERO
+
 
 class MoveForward(Action):
     def __init__(self, house_map):
@@ -40,28 +42,16 @@ class MoveForward(Action):
         next_pos = self._move()
         self._robot.position = next_pos
         self._robot.action_count += 1
-        self._house_map.record_path(next_pos)
+        self._house_map.record_footprint(next_pos)
 
-        reward, done = self._calc_reward(next_pos)
-        return next_pos, reward, done
+        return next_pos, self._calc_reward(), self._house_map.is_all_covered()
 
     def _move(self):
         next_box, next_pos = self._house_map.get_next_box()
         if not next_box.is_wall():
-            # print 'new positon', next_pos
             return next_pos
         else:
             return self._src_pos
-
-    def _calc_reward(self, next_pos):
-        if next_pos == TARGET_POS:
-            return REWARD_DONE, True
-
-        print self._robot.action_count
-        if self._robot.action_count >= STEP:
-            return REWARD_NOT_FINISHED, False
-
-        return REWARD_ZERO, False
 
 
 class TurnLeft(Action):
@@ -69,11 +59,9 @@ class TurnLeft(Action):
         Action.__init__(self, house_map)
 
     def execute(self):
-        print 'turn left'
         self._robot.direction = TurnType.TURN_LEFT
         self._robot.action_count += 1
-        reward = REWARD_NOT_FINISHED if self._robot.action_count >= STEP else REWARD_ZERO
-        return self._src_pos, reward, False
+        return self._src_pos, self._calc_reward(), False
 
 
 class TurnRight(Action):
@@ -81,8 +69,6 @@ class TurnRight(Action):
         Action.__init__(self, house_map)
 
     def execute(self):
-        print 'turn right'
         self._robot.direction = TurnType.TURN_RIGHT
         self._robot.action_count += 1
-        reward = REWARD_NOT_FINISHED if self._robot.action_count >= STEP else REWARD_ZERO
-        return self._src_pos, reward, False
+        return self._src_pos, self._calc_reward(), False

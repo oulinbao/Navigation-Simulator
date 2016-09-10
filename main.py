@@ -18,6 +18,7 @@ class HouseFrame(wx.Frame):
 
     def refresh(self, position, show_type):
         self._house_map.show_robot(position)
+        self._house_map.show_repeated(position)
         self.SetTitle(show_type)
         self.panel.Refresh()
 
