@@ -30,7 +30,6 @@ class Game(object):
     def train_episode(self, dqn):
         total_reward = 0
         state = self._env.reset()
-        print len(state)
 
         for step in xrange(MAX_STEP):
             action_type = dqn.get_egreedy_action(state)

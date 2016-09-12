@@ -135,7 +135,7 @@ class HouseMap(ENV):
         return box.passed_count == 1
 
     def calculate_repeat_rate(self):
-        return float(self._repeated_count()) / self._covered_count()
+        return 0 if self._covered_count() == 0 else float(self._repeated_count()) / self._covered_count()
 
     def calculate_coverage_rate(self):
         return float(self._covered_count()) / self._all_availabe_count()
