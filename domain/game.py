@@ -23,9 +23,9 @@ class Game(object):
             self.train_episode(dqn)
             dqn.save_train_params()
 
-            sleep(1)
-            if episode % 5 == 0:
-                self.test_dqn(dqn)
+            # sleep(1)
+            # if episode % 5 == 0:
+            #     self.test_dqn(dqn)
 
     def train_episode(self, dqn):
         total_reward = 0

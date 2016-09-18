@@ -9,6 +9,7 @@ from infra.color import Color
 from abc import ABCMeta, abstractmethod
 import wx
 import time
+import numpy as np
 
 
 class ENV(object):
@@ -95,8 +96,7 @@ class HouseMap(ENV):
                       ACTION_TURN_RIGHT: TurnRight(self)}
         action = action_map[action_type]
         next_pos, reward, done = action.execute()
-        return self._robot.current_state + self._collect_current_state(), \
-            reward, done
+        return [self._collect_current_state(), self._robot.current_state], reward, done
 
     def show_robot(self):
         box = self.get_box(self._robot.position)
@@ -111,20 +111,19 @@ class HouseMap(ENV):
         wx.CallAfter(self._frame.reset)
         time.sleep(1)  # release cpu time
         print 'env reset ok'
-        return self._robot.init_state + self._collect_current_state()
+        return [self._collect_current_state(), self._robot.init_state]
 
     def _collect_current_state(self):
-        # [index, state{0:not pass, 1:passed, 2:wall}, ....]
+        # [state{0:not pass, 1:passed, 2:wall}, ....]
         state = []
         for box in self._boxes:
-            state.append(box.id)
             if box.is_wall():
                 state.append(BoxState.BOX_STATE_WALL)
             elif box.passed_count == 0:
                 state.append(BoxState.BOX_STATE_NOT_PASS)
             else:
                 state.append(BoxState.BOX_STATE_PASSED)
-        return state
+        return np.array(state).reshape([10, 10, 1]).tolist()
 
     def record_footprint(self, pos):
         box = self.get_box(pos)
