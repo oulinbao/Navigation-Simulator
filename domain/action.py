@@ -1,11 +1,7 @@
 from abc import ABCMeta, abstractmethod
-from direction import TurnType
+from actiontype import ActionType
 from reward import RewardCalculator, REWARD_ZERO
-from game import MAX_STEP
-
-ACTION_MOVE_FORWARD = 0
-ACTION_TURN_LEFT = 1
-ACTION_TURN_RIGHT = 2
+from domain.game import MAX_STEP
 
 
 class Command(object):
@@ -33,6 +29,11 @@ class Action(Command):
             return calculator.calculate()
         return REWARD_ZERO
 
+    def _calc_stop_reward(self):
+        if self._robot.always_turn_around():
+            return -0.2
+        return 0
+
 
 class MoveForward(Action):
     def __init__(self, house_map):
@@ -40,25 +41,29 @@ class MoveForward(Action):
 
     def execute(self):
         next_pos = self._move()
+        self._house_map.record_footprint(next_pos)
+
         # print next_pos
         self._robot.position = next_pos
         self._robot.action_count += 1
+        self._robot.record_action(ActionType.ACTION_MOVE_FORWARD)
 
-        return next_pos, self._calc_reward(next_pos), self._house_map.is_all_covered()
+        return next_pos, self._calc_reward(next_pos) + self._calc_repeat_reward(next_pos), \
+            self._house_map.is_all_covered()
 
     def _move(self):
         next_box, next_pos = self._house_map.get_next_box()
         if not next_box.is_wall():
-            self._house_map.record_footprint(next_pos)
             return next_pos
         else:
+            print 'hit wall'
             return self._src_pos
 
-
-        # if self._house_map.just_passed(next_pos):
-        #     return 1
-        # else:
-        #     return -1
+    def _calc_repeat_reward(self, pos):
+        box = self._house_map.get_box(pos)
+        if box.passed_count > 1:
+            return -0.1
+        return 0
 
 
 class TurnLeft(Action):
@@ -66,10 +71,12 @@ class TurnLeft(Action):
         Action.__init__(self, house_map)
 
     def execute(self):
-        # print 'left'
-        self._robot.direction = TurnType.TURN_LEFT
+        print 'left'
+        self._robot.direction = ActionType.ACTION_TURN_LEFT
         self._robot.action_count += 1
-        return self._src_pos, self._calc_reward(self._src_pos), False
+        self._robot.record_action(ActionType.ACTION_TURN_LEFT)
+
+        return self._src_pos, self._calc_reward(self._src_pos) + self._calc_stop_reward(), False
 
 
 class TurnRight(Action):
@@ -77,7 +84,9 @@ class TurnRight(Action):
         Action.__init__(self, house_map)
 
     def execute(self):
-        # print 'right'
-        self._robot.direction = TurnType.TURN_RIGHT
+        print 'right'
+        self._robot.direction = ActionType.ACTION_TURN_RIGHT
         self._robot.action_count += 1
-        return self._src_pos, self._calc_reward(self._src_pos), False
+        self._robot.record_action(ActionType.ACTION_TURN_RIGHT)
+
+        return self._src_pos, self._calc_reward(self._src_pos) + self._calc_stop_reward(), False

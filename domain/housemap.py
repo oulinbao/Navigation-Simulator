@@ -34,8 +34,7 @@ class HouseMap(ENV):
         self._frame = frame
         self._robot = Robot(INIT_POSITION, Direction.EAST)
         self._walls = [HorizonWall(0, 9), VerticalWall(9, 99),
-                       HorizonWall(90, 99), VerticalWall(0, 99),
-                       VerticalWall(43, 73), VerticalWall(5, 45), VerticalWall(57, 77)]
+                       HorizonWall(90, 99), VerticalWall(0, 99)]
         self._draw_house(panel)
 
     @property
@@ -72,6 +71,9 @@ class HouseMap(ENV):
             box.change_color(Color.WHITE)
             box.passed_count = 0
 
+        init_box = self.get_box(INIT_POSITION)
+        init_box.passed_count = 1
+
     def _reset_robot(self):
         self._robot.reset()
 
@@ -91,9 +93,9 @@ class HouseMap(ENV):
         return self.get_box(next_pos), next_pos
 
     def accept(self, action_type):
-        action_map = {ACTION_MOVE_FORWARD: MoveForward(self),
-                      ACTION_TURN_LEFT: TurnLeft(self),
-                      ACTION_TURN_RIGHT: TurnRight(self)}
+        action_map = {ActionType.ACTION_MOVE_FORWARD: MoveForward(self),
+                      ActionType.ACTION_TURN_LEFT: TurnLeft(self),
+                      ActionType.ACTION_TURN_RIGHT: TurnRight(self)}
         action = action_map[action_type]
         next_pos, reward, done = action.execute()
         return [self._collect_current_state(), self._robot.current_state], reward, done
@@ -128,10 +130,6 @@ class HouseMap(ENV):
     def record_footprint(self, pos):
         box = self.get_box(pos)
         box.passed_count += 1
-
-    def just_passed(self, pos):
-        box = self.get_box(pos)
-        return box.passed_count == 1
 
     def calculate_repeat_rate(self):
         return 0 if self._covered_count() == 0 else float(self._repeated_count()) / self._covered_count()

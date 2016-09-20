@@ -2,6 +2,8 @@ import tensorflow as tf
 import numpy as np
 from collections import deque
 import random
+from domain.direction import Direction
+from domain.actiontype import ActionType
 
 # Hyper Parameters for DQN
 STATE_DIM = 3           # robot state([row, col, direction])
@@ -74,7 +76,7 @@ class DQN():
         self.y_input = tf.placeholder("float", [None])
         Q_action = tf.reduce_sum(tf.mul(self.Q_value, self.action_input), reduction_indices=1)
         self.cost = tf.reduce_mean(tf.square(self.y_input - Q_action))
-        self.optimizer = tf.train.AdamOptimizer(1e-4).minimize(self.cost)
+        self.optimizer = tf.train.AdamOptimizer(1e-3).minimize(self.cost)
 
     def _train_Q_network(self):
         if len(self.replay_buffer) < BATCH_SIZE:
@@ -153,3 +155,28 @@ class DQN():
 
     def save_train_params(self):
         self.saver.save(self.session, 'algrithm/train_result')
+
+    def get_action_from_good_example(self, robot_state):
+        position = (robot_state[0], robot_state[1])
+        direction = robot_state[2]
+
+        action_map = {Direction.EAST:ActionType.ACTION_MOVE_FORWARD,
+                      Direction.WEST: ActionType.ACTION_MOVE_FORWARD}
+
+        if position in [(1,8),(3,8),(5,8),(7,8)]:
+            action_map = {Direction.EAST:ActionType.ACTION_TURN_RIGHT,
+                          Direction.SOUTH:ActionType.ACTION_MOVE_FORWARD}
+
+        if position in [(2,8),(4,8),(6,8),(8,8)]:
+            action_map = {Direction.WEST:ActionType.ACTION_MOVE_FORWARD,
+                          Direction.SOUTH:ActionType.ACTION_TURN_RIGHT}
+
+        if position in [(2,1),(4,1),(6,1),(8,1)]:
+            action_map = {Direction.WEST:ActionType.ACTION_TURN_LEFT,
+                          Direction.SOUTH:ActionType.ACTION_MOVE_FORWARD}
+
+        if position in [(3,1),(5,1),(7,1),(9,1)]:
+            action_map = {Direction.EAST:ActionType.ACTION_MOVE_FORWARD,
+                          Direction.SOUTH:ActionType.ACTION_TURN_LEFT}
+
+        return action_map[direction]
