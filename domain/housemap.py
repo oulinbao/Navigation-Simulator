@@ -7,7 +7,6 @@ from direction import Direction
 from infra import config
 from infra.color import Color
 from abc import ABCMeta, abstractmethod
-import wx
 import time
 import numpy as np
 
@@ -28,31 +27,28 @@ class ENV(object):
 
 
 class HouseMap(ENV):
-    def __init__(self, panel, frame):
+    def __init__(self):
         self._boxes = []
-        self._panel = panel
-        self._frame = frame
         self._robot = Robot(INIT_POSITION, Direction.EAST)
         self._walls = [HorizonWall(0, 9), VerticalWall(9, 99),
                        HorizonWall(90, 99), VerticalWall(0, 99)]
-        self._draw_house(panel)
+        self._draw_house()
 
     @property
     def robot(self):
         return self._robot
 
-    def _draw_house(self, panel):
-        self._draw_base_grid(panel)
+    def _draw_house(self):
+        self._draw_base_grid()
         self._draw_walls(self._walls)
 
-    def _draw_base_grid(self, panel):
+    def _draw_base_grid(self):
         for row in range(config.ROW_NUM):
             for col in range(config.COL_NUM):
                 box_id = row * config.COL_NUM + col
                 position = (col * config.UNIT_WIDTH, row * config.UNIT_WIDTH)
-                size = (config.UNIT_WIDTH, config.UNIT_WIDTH)
 
-                box = Box(panel, box_id, Color.WHITE, position=position, size=size)
+                box = Box(box_id, Color.WHITE, position=position)
                 self._boxes.append(box)
 
     def _draw_walls(self, walls):
@@ -110,9 +106,8 @@ class HouseMap(ENV):
             box.change_color(Color.RED)
 
     def reset(self):
-        wx.CallAfter(self._frame.reset)
-        time.sleep(1)  # release cpu time
-        print 'env reset ok'
+        self.reset_house_map()
+        self.show_robot()
         return [self._collect_current_state(), self._robot.init_state]
 
     def _collect_current_state(self):

@@ -40,18 +40,22 @@ class DQN():
 
     def create_Q_network(self):
         # network weights
-        W_conv1 = self.weight_variable([3, 3, 1, 6])
-        b_conv1 = self.bias_variable([6])
-        W_conv2 = self.weight_variable([3, 3, 6, 10])
-        b_conv2 = self.bias_variable([10])
-        W_conv3 = self.weight_variable([3, 3, 10, 10])
-        b_conv3 = self.bias_variable([10])
-        W_fc1 = self.weight_variable([160, 32])
-        b_fc1 = self.bias_variable([32])
-        W_fc2 = self.weight_variable([35, 35])
-        b_fc2 = self.bias_variable([35])
-        W_fc3 = self.weight_variable([35, self.action_dim])
-        b_fc3 = self.bias_variable([self.action_dim])
+        W_conv1 = self.weight_variable([3, 3, 1, 16])
+        b_conv1 = self.bias_variable([16])
+        W_conv2 = self.weight_variable([3, 3, 16, 32])
+        b_conv2 = self.bias_variable([32])
+        W_conv3 = self.weight_variable([3, 3, 32, 64])
+        b_conv3 = self.bias_variable([64])
+        W_conv4 = self.weight_variable([3, 3, 64, 128])
+        b_conv4 = self.bias_variable([128])
+        W_fc1 = self.weight_variable([512, 256])
+        b_fc1 = self.bias_variable([256])
+        W_fc2 = self.weight_variable([259, 128])
+        b_fc2 = self.bias_variable([128])
+        W_fc3 = self.weight_variable([128, 64])
+        b_fc3 = self.bias_variable([64])
+        W_fc4 = self.weight_variable([64, self.action_dim])
+        b_fc4 = self.bias_variable([self.action_dim])
 
         # input layer
         self.state_input = tf.placeholder("float", [None, 10, 10, 1])
@@ -61,15 +65,17 @@ class DQN():
         h_conv1 = tf.nn.relu(self.conv2d(self.state_input, W_conv1, 1) + b_conv1)
         h_conv2 = tf.nn.relu(self.conv2d(h_conv1, W_conv2, 1) + b_conv2)
         h_conv3 = tf.nn.relu(self.conv2d(h_conv2, W_conv3, 1) + b_conv3)
-        h_conv3_flat = tf.reshape(h_conv3, [-1, 160])
-        h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
+        h_conv4 = tf.nn.relu(self.conv2d(h_conv3, W_conv4, 1) + b_conv4)
+        h_conv4_flat = tf.reshape(h_conv4, [-1, 512])
+        h_fc1 = tf.nn.relu(tf.matmul(h_conv4_flat, W_fc1) + b_fc1)
 
         # append robot state
         h_fc_combine = tf.concat(1, [h_fc1, self.state_robot])
         h_fc2 = tf.nn.relu(tf.matmul(h_fc_combine, W_fc2) + b_fc2)
+        h_fc3 = tf.nn.relu(tf.matmul(h_fc2, W_fc3) + b_fc3)
 
         # Q Value layer
-        self.Q_value = tf.matmul(h_fc2, W_fc3) + b_fc3
+        self.Q_value = tf.matmul(h_fc3, W_fc4) + b_fc4
 
     def create_training_method(self):
         self.action_input = tf.placeholder("float", [None, self.action_dim])  # one hot presentation
