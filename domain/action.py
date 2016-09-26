@@ -30,9 +30,9 @@ class Action(Command):
         return REWARD_ZERO
 
     def _calc_stop_reward(self):
-        if self._robot.always_turn_around():
-            return -0.2
-        return 0
+        # if self._robot.always_turn_around():
+        #     return -10
+        return -0.5
 
 
 class MoveForward(Action):
@@ -41,22 +41,22 @@ class MoveForward(Action):
 
     def execute(self):
         next_pos = self._move()
-        self._house_map.record_footprint(next_pos)
 
         # print next_pos
         self._robot.position = next_pos
         self._robot.action_count += 1
         self._robot.record_action(ActionType.ACTION_MOVE_FORWARD)
 
-        return next_pos, self._calc_reward(next_pos) + self._calc_repeat_reward(next_pos), \
+        return next_pos, self._calc_reward(next_pos) + self._calc_hitwall_reward(next_pos), \
             self._house_map.is_all_covered()
 
     def _move(self):
         next_box, next_pos = self._house_map.get_next_box()
         if not next_box.is_wall():
+            self._house_map.record_footprint(next_pos)
             return next_pos
         else:
-            print 'hit wall'
+            # print 'hit wall'
             return self._src_pos
 
     def _calc_repeat_reward(self, pos):
@@ -65,13 +65,18 @@ class MoveForward(Action):
             return -0.1
         return 0
 
+    def _calc_hitwall_reward(self, next_pos):
+        if self._src_pos == next_pos:
+            return -0.8
+        return 0
+
 
 class TurnLeft(Action):
     def __init__(self, house_map):
         Action.__init__(self, house_map)
 
     def execute(self):
-        print 'left'
+        # print 'left'
         self._robot.direction = ActionType.ACTION_TURN_LEFT
         self._robot.action_count += 1
         self._robot.record_action(ActionType.ACTION_TURN_LEFT)
@@ -84,7 +89,7 @@ class TurnRight(Action):
         Action.__init__(self, house_map)
 
     def execute(self):
-        print 'right'
+        # print 'right'
         self._robot.direction = ActionType.ACTION_TURN_RIGHT
         self._robot.action_count += 1
         self._robot.record_action(ActionType.ACTION_TURN_RIGHT)

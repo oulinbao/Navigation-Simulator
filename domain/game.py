@@ -5,7 +5,7 @@ from algrithm.dqn import DQN
 
 EPISODE = 100000     # Episode limitation
 MAX_STEP = 400          # Step limitation in an episode
-INIT_POSITION = [3, 3]
+INIT_POSITION = [1, 1]
 INIT_DIRECTION = Direction.EAST
 
 
@@ -32,12 +32,15 @@ class Game(object):
         state = self._env.reset()
 
         for step in xrange(MAX_STEP):
-            # if episode % 4 == 0:
-            #     action_type = dqn.get_action_from_good_example(state[1])
-            # else:
-            action_type = dqn.get_egreedy_action(state)
+            if episode % 3 == 0:
+                action_type = dqn.get_horizon_action(state[1])
+            elif episode % 3 == 1:
+                action_type = dqn.get_vertical_action(state[1])
+            else:
+                action_type = dqn.get_egreedy_action(state)
+
             next_state, reward, done = self._env.accept(action_type)
-            print 'step reward:', reward, ' total:', total_reward
+            # print 'step reward:', reward, ' total:', total_reward
             dqn.perceive(state, action_type, reward, next_state, done)
 
             wx.CallAfter(self._house_frame.refresh, 'training...')
