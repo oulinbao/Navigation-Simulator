@@ -6,8 +6,8 @@ from domain.direction import Direction
 from domain.actiontype import ActionType
 
 # Hyper Parameters for DQN
-STATE_DIM = 3           # robot state([row, col, direction])
-ACTION_DIM = 3          # move_forward, turn right, turn left
+STATE_DIM = 2           # robot state([row, col])
+ACTION_DIM = 4          # move_forward, right, left, back
 GAMMA = 0.9             # discount factor for target Q
 INITIAL_EPSILON = 0.5   # starting value of epsilon
 FINAL_EPSILON = 0.01    # final value of epsilon
@@ -50,7 +50,7 @@ class DQN():
         b_conv4 = self.bias_variable([128])
         W_fc1 = self.weight_variable([512, 256])
         b_fc1 = self.bias_variable([256])
-        W_fc2 = self.weight_variable([259, 128])
+        W_fc2 = self.weight_variable([258, 128])
         b_fc2 = self.bias_variable([128])
         W_fc3 = self.weight_variable([128, 64])
         b_fc3 = self.bias_variable([64])
@@ -143,8 +143,8 @@ class DQN():
 
         # self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / 1000000
         if random.random() <= self.epsilon:
-            action_map = [0,0,0,0,0,1,2]
-            return action_map[random.randint(0, 6)]
+            action_map = [ActionType.E,ActionType.N,ActionType.S,ActionType.W]
+            return action_map[random.randint(0, 3)]
             # return random.randint(0, self.action_dim - 1)
         else:
             # print 'DQN action probability:', self.epsilon

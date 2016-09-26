@@ -32,12 +32,12 @@ class Game(object):
         state = self._env.reset()
 
         for step in xrange(MAX_STEP):
-            if episode % 3 == 0:
-                action_type = dqn.get_horizon_action(state[1])
-            elif episode % 3 == 1:
-                action_type = dqn.get_vertical_action(state[1])
-            else:
-                action_type = dqn.get_egreedy_action(state)
+            # if episode % 3 == 0:
+            #     action_type = dqn.get_horizon_action(state[1])
+            # elif episode % 3 == 1:
+            #     action_type = dqn.get_vertical_action(state[1])
+            # else:
+            action_type = dqn.get_egreedy_action(state)
 
             next_state, reward, done = self._env.accept(action_type)
             # print 'step reward:', reward, ' total:', total_reward

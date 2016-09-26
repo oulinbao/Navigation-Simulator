@@ -1,4 +1,5 @@
 class ActionType():
-    ACTION_MOVE_FORWARD = 0
-    ACTION_TURN_LEFT = 1
-    ACTION_TURN_RIGHT = 2
+    N = 0
+    E = 1
+    S = 2
+    W = 3

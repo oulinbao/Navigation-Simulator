@@ -20,14 +20,14 @@ class Robot(object):
     def position(self, pos):
         self._position = pos
 
-    @property
-    def direction(self):
-        return self._direction
+    # @property
+    # def direction(self):
+    #     return self._direction
 
-    @direction.setter
-    def direction(self, action_type):
-        offset = {ActionType.ACTION_TURN_LEFT : -1, ActionType.ACTION_TURN_RIGHT : +1}
-        self._direction = (self._direction + offset[action_type]) % 4
+    # @direction.setter
+    # def direction(self, action_type):
+    #     offset = {ActionType.ACTION_TURN_LEFT : -1, ActionType.ACTION_TURN_RIGHT : +1}
+    #     self._direction = (self._direction + offset[action_type]) % 4
 
     @property
     def action_count(self):
@@ -44,18 +44,15 @@ class Robot(object):
 
     @property
     def init_state(self):
-        return [INIT_POSITION[0], INIT_POSITION[1], INIT_DIRECTION]
+        return [INIT_POSITION[0], INIT_POSITION[1]]
 
     @property
     def current_state(self):
-        return [self._position[0], self._position[1], self._direction]
+        return [self._position[0], self._position[1]]
 
     def record_action(self, action_type):
         if len(self._action_record) > Robot.RECORD_SIZE:
             self._action_record.pop(0)
         self._action_record.append(action_type)
 
-    def always_turn_around(self):
-        move_count = len([x for x in self._action_record if x == ActionType.ACTION_MOVE_FORWARD])
-        return move_count == 0
 

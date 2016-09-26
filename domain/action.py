@@ -18,9 +18,6 @@ class Action(Command):
         self._src_pos = self._house_map.robot.position
         self._robot = house_map.robot
 
-    def execute(self):
-        pass
-
     def _calc_reward(self, next_pos):
         if self._robot.action_count == MAX_STEP or self._house_map.is_all_covered():
             calculator = RewardCalculator(self._house_map.calculate_coverage_rate(),
@@ -34,31 +31,6 @@ class Action(Command):
         #     return -10
         return -0.5
 
-
-class MoveForward(Action):
-    def __init__(self, house_map):
-        Action.__init__(self, house_map)
-
-    def execute(self):
-        next_pos = self._move()
-
-        # print next_pos
-        self._robot.position = next_pos
-        self._robot.action_count += 1
-        self._robot.record_action(ActionType.ACTION_MOVE_FORWARD)
-
-        return next_pos, self._calc_reward(next_pos) + self._calc_hitwall_reward(next_pos), \
-            self._house_map.is_all_covered()
-
-    def _move(self):
-        next_box, next_pos = self._house_map.get_next_box()
-        if not next_box.is_wall():
-            self._house_map.record_footprint(next_pos)
-            return next_pos
-        else:
-            # print 'hit wall'
-            return self._src_pos
-
     def _calc_repeat_reward(self, pos):
         box = self._house_map.get_box(pos)
         if box.passed_count > 1:
@@ -67,31 +39,62 @@ class MoveForward(Action):
 
     def _calc_hitwall_reward(self, next_pos):
         if self._src_pos == next_pos:
-            return -0.8
+            return -100
         return 0
 
+    def _move(self, action):
+        next_box, next_pos = self._house_map.get_next_box(action)
+        if not next_box.is_wall():
+            self._house_map.record_footprint(next_pos)
+            return next_pos
+        else:
+            # print 'hit wall'
+            return self._src_pos
 
-class TurnLeft(Action):
+    def response(self, next_pos):
+        return next_pos, self._calc_reward(next_pos) + self._calc_hitwall_reward(next_pos), \
+            self._house_map.is_all_covered()
+
+
+class MoveEast(Action):
     def __init__(self, house_map):
         Action.__init__(self, house_map)
 
     def execute(self):
-        # print 'left'
-        self._robot.direction = ActionType.ACTION_TURN_LEFT
+        next_pos = self._move(ActionType.E)
+        self._robot.position = next_pos
         self._robot.action_count += 1
-        self._robot.record_action(ActionType.ACTION_TURN_LEFT)
-
-        return self._src_pos, self._calc_reward(self._src_pos) + self._calc_stop_reward(), False
+        return self.response(next_pos)
 
 
-class TurnRight(Action):
+class MoveWest(Action):
     def __init__(self, house_map):
         Action.__init__(self, house_map)
 
     def execute(self):
-        # print 'right'
-        self._robot.direction = ActionType.ACTION_TURN_RIGHT
+        next_pos = self._move(ActionType.W)
+        self._robot.position = next_pos
         self._robot.action_count += 1
-        self._robot.record_action(ActionType.ACTION_TURN_RIGHT)
+        return self.response(next_pos)
 
-        return self._src_pos, self._calc_reward(self._src_pos) + self._calc_stop_reward(), False
+
+class MoveSouth(Action):
+    def __init__(self, house_map):
+        Action.__init__(self, house_map)
+
+    def execute(self):
+        next_pos = self._move(ActionType.S)
+        self._robot.position = next_pos
+        self._robot.action_count += 1
+        return self.response(next_pos)
+
+
+class MoveNorth(Action):
+    def __init__(self, house_map):
+        Action.__init__(self, house_map)
+
+    def execute(self):
+        next_pos = self._move(ActionType.N)
+        self._robot.position = next_pos
+        self._robot.action_count += 1
+        return self.response(next_pos)

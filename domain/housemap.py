@@ -83,19 +83,20 @@ class HouseMap(ENV):
         box_id = row * config.COL_NUM + col
         return self._boxes[box_id]
 
-    def get_next_box(self):
-        offset = {Direction.EAST: (0, 1),
-                  Direction.SOUTH: (1, 0),
-                  Direction.WEST: (0, -1),
-                  Direction.NORTH: (-1, 0)}
+    def get_next_box(self, action):
+        offset = {ActionType.E: (0, 1),
+                  ActionType.S: (1, 0),
+                  ActionType.W: (0, -1),
+                  ActionType.N: (-1, 0)}
 
-        next_pos = map(lambda x, y: x + y, self._robot.position, offset[self._robot.direction])
+        next_pos = map(lambda x, y: x + y, self._robot.position, offset[action])
         return self.get_box(next_pos), next_pos
 
     def accept(self, action_type):
-        action_map = {ActionType.ACTION_MOVE_FORWARD: MoveForward(self),
-                      ActionType.ACTION_TURN_LEFT: TurnLeft(self),
-                      ActionType.ACTION_TURN_RIGHT: TurnRight(self)}
+        action_map = {ActionType.E: MoveEast(self),
+                      ActionType.W: MoveWest(self),
+                      ActionType.S: MoveSouth(self),
+                      ActionType.N: MoveNorth(self)}
         action = action_map[action_type]
         next_pos, reward, done = action.execute()
         return [self._collect_current_state(), self._robot.current_state], reward, done
