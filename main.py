@@ -10,23 +10,22 @@ class HouseFrame(wx.Frame):
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title,
                           size=(config.HOUSE_LENGTH, config.HOUSE_WIDTH))
-        self.condition = Condition()
         self.panel = wx.Panel(self, -1)
         self._house_map = HouseMap(self.panel, self)
         thread = Thread(target=self.start)
         thread.start()
         self.Show(True)
 
-    def refresh(self, position, show_type):
-        self._house_map.show_robot(position)
+    def refresh(self, show_type):
+        self._house_map.show_robot()
+        self._house_map.show_repeated()
         self.SetTitle(show_type)
         self.panel.Refresh()
 
     def reset(self):
-        with self.condition:
-            self._house_map.reset_house_map()
-            self.condition.notify()
-            print 'reset finished in frame!'
+        self._house_map.reset_house_map()
+        self._house_map.show_robot()
+        print 'reset finished in frame!'
 
     def start(self):
         game = Game(self, self._house_map)

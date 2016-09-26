@@ -1,6 +1,11 @@
 import wx
 from infra.color import Color
 
+class BoxState():
+    BOX_STATE_NOT_PASS = 0
+    BOX_STATE_PASSED = 1
+    BOX_STATE_WALL =2
+
 
 class Box(object):
 
@@ -18,14 +23,8 @@ class Box(object):
         self._bitmap = wx.StaticBitmap(panel, box_id, self.color_map[color], 
                                        pos=position, size=size)
         self._position = position
-        self._passed = False
-
-    def __del__(self):
-        del self._bitmap
-        del self._white_box
-        del self._black_box
-        del self._green_box
-        del self._red_box
+        self._box_id = box_id
+        self._passed_count = 0
         
     def _create_bitmap(self, image_name):
         return wx.Image(image_name, wx.BITMAP_TYPE_JPEG).ConvertToBitmap()
@@ -37,9 +36,17 @@ class Box(object):
         return self._bitmap.GetBitmap() == self._black_box
 
     @property
-    def pass_through(self):
-        return self._passed
+    def passed_count(self):
+        return self._passed_count
 
-    @pass_through.setter
-    def pass_through(self, flag):
-        self._passed = flag
+    @passed_count.setter
+    def passed_count(self, flag):
+        self._passed_count = flag
+
+    @property
+    def id(self):
+        return self._box_id
+
+    @property
+    def position(self):
+        return self._position
