@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from direction import TurnType
-from game import TARGET_POS, STEP
+from game import STEP
 
 ACTION_MOVE_FORWARD = 0
 ACTION_TURN_LEFT = 1
@@ -54,34 +54,15 @@ class MoveForward(Action):
             return self._src_pos
 
     def _calc_reward(self, next_pos):
-        if next_pos[0] < TARGET_POS[0] + 3 and next_pos[0] > TARGET_POS[0] - 3 and \
-             next_pos[1] < TARGET_POS[1] + 3 and next_pos[1] > TARGET_POS[1] - 3:
-            if self._robot.action_count > 300:
-                return REWARD_DONE, True
-            else:
-                return REWARD_GOOD, True
+        if next_pos == self._house_map.target_pos:
+            return REWARD_DONE, True
 
         print self._robot.action_count
-        if self._robot.action_count >= STEP - 1:
+        if self._robot.action_count >= STEP:
             return REWARD_NOT_FINISHED, False
 
         return REWARD_ZERO, False
-        # if self._more_far(next_pos):
-        #     return REWARD_FAR, False
-        # elif self._repeat(next_pos):
-        #     return REWARD_REPEAT, False
 
-    # def _more_far(self, next_pos):
-    #     old_distance = self._calc_distance(self._src_pos, TARGET_POS)
-    #     new_distance = self._calc_distance(next_pos, TARGET_POS)
-    #     return new_distance > old_distance
-    #
-    # def _calc_distance(self, pos1, pos2):
-    #     result = map(lambda x, y : y - x, pos1, pos2)
-    #     return result[0]**2 + result[1]**2
-    #
-    # def _repeat(self, pos):
-    #     return self._house_map.is_repeated(pos)
 
 class TurnLeft(Action):
     def __init__(self, house_map):
@@ -91,7 +72,8 @@ class TurnLeft(Action):
         print 'turn left'
         self._robot.direction = TurnType.TURN_LEFT
         self._robot.action_count += 1
-        return self._src_pos, REWARD_ZERO, False
+        reward = REWARD_NOT_FINISHED if self._robot.action_count >= STEP else REWARD_ZERO
+        return self._src_pos, reward, False
 
 
 class TurnRight(Action):
@@ -102,4 +84,5 @@ class TurnRight(Action):
         print 'turn right'
         self._robot.direction = TurnType.TURN_RIGHT
         self._robot.action_count += 1
-        return self._src_pos, REWARD_ZERO, False
+        reward = REWARD_NOT_FINISHED if self._robot.action_count >= STEP else REWARD_ZERO
+        return self._src_pos, reward, False

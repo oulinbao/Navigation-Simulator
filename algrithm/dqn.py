@@ -4,10 +4,10 @@ from collections import deque
 import random
 
 # Hyper Parameters for DQN
-STATE_DIM = 3           # row, col
+STATE_DIM = 5           # init row, col, direction, target row, col
 ACTION_DIM = 3          # move_forward, turn right, turn left
 GAMMA = 0.9             # discount factor for target Q
-INITIAL_EPSILON = 0.7   # starting value of epsilon
+INITIAL_EPSILON = 0.9   # starting value of epsilon
 FINAL_EPSILON = 0.01    # final value of epsilon
 REPLAY_SIZE = 10000     # experience replay buffer size
 BATCH_SIZE = 10         # size of minibatch
@@ -60,7 +60,7 @@ class DQN():
         self.y_input = tf.placeholder("float", [None])
         Q_action = tf.reduce_sum(tf.mul(self.Q_value, self.action_input), reduction_indices=1)
         self.cost = tf.reduce_mean(tf.square(self.y_input - Q_action))
-        self.optimizer = tf.train.AdamOptimizer(0.0001).minimize(self.cost)
+        self.optimizer = tf.train.AdamOptimizer(1e-4).minimize(self.cost)
 
     def _train_Q_network(self):
         if len(self.replay_buffer) < BATCH_SIZE:
@@ -105,7 +105,7 @@ class DQN():
 
     def get_egreedy_action(self, state):
         Q_value = self.Q_value.eval(feed_dict={self.state_input: [state]})[0]
-        # self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / 1000000
+        self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / 100000
 
         if random.random() <= self.epsilon:
             action_map = [0,0,0,0,0,1,2]
